@@ -13,7 +13,9 @@
       v-for="(pokemon, idx) in filteredPokemon"
       :key="idx"
     >
-      {{ pokemon.name }}
+      <router-link :to="`/about/${urlIdLookup[pokemon.name]}`">{{
+        pokemon.name
+      }}</router-link>
     </div>
   </div>
 </template>
@@ -32,22 +34,21 @@ export default {
       filteredPokemon: computed(() => updatePokemon()),
     });
     function updatePokemon() {
-      if (!state.text) {
+      if (!state.text.length) {
         return [];
       }
       return state.pokemons.filter((pokemon) =>
         pokemon.name.includes(state.text)
       );
     }
-
     fetch('https://pokeapi.co/api/v2/pokemon?offset=0')
       .then((res) => res.json())
       .then((data) => {
-        console.log(data);
         state.pokemons = data.results;
-        state.urlIdLookup = data.results.reduce((acc, cur, idx) => {
-          (acc = { ...acc, [cur.name]: idx + 1 }), {};
-        });
+        state.urlIdLookup = data.results.reduce(
+          (acc, cur, idx) => (acc = { ...acc, [cur.name]: idx + 1 }),
+          {}
+        );
       });
     return { ...toRefs(state) };
   },
